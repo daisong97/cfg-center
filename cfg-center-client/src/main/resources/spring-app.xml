@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+        
+ 	<context:annotation-config/>
+ 	<context:component-scan base-package="xyz.daisong.test"/>
+	<!-- <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <property name="locations" value="classpath:jdbc.properties"/>
+	</bean> -->
+	
+	<bean class="xyz.daisong.service.ConfigurationCenterImpl" >
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:cfg-center.properties</value>
+			</list>
+		</property>
+		
+		 <property name="properties">
+	        <value>custom.strategy.class=com.foo.DefaultStrategy</value>
+	    </property>
+	</bean>
+</beans>
