@@ -12,8 +12,6 @@ import xyz.daisong.zookeeper.exceptions.ZkConnectException;
 @Service("zKConnectService")
 public class ZKConnectServiceImpl implements ZKConnectService {
 	
-	//private ZkClient zkClient;
-	
 	@Value("${zk-address}")
 	private String zkAddress = "127.0.0.1:2181";
 	
@@ -30,22 +28,41 @@ public class ZKConnectServiceImpl implements ZKConnectService {
 	}
 
 	private synchronized ZkClient getConnect() throws ZkConnectException{
-		/*if(zkClient != null 
-				&& zkClient.getZookeeper().getState().isAlive()){
-				return zkClient;
-		}*/
 		ZkClientFactory factory = new ZkClientFactoryImpl();
-		ZkClient client = null;
-		client = factory.newClient(zkAddress);
-		//client.getZookeeper().addAuthInfo(scheme, auth.getBytes());
-		return client;
+		ZkClient zkClient  = factory.newClient(zkAddress);
+		return zkClient;
 	}
 	public static void main(String[] args) throws Exception {
 		//127.0.0.1:2181
 		ZKConnectServiceImpl pool = new ZKConnectServiceImpl();
 		ZkClient connect = pool.getConnect();
 		
-		connect.mkdir("/p1/p2/p3/p4/p5","hello world!");
-		connect.close();
+	//	connect.mkdir("/p1/p2/p3/p4/p5","hello world!");
+		
+		//写
+		/*List<ACL> acls = new ArrayList<ACL>();
+		ACL acl = new ACL(ZooDefs.Perms.ALL, new Id("digest", DigestAuthenticationProvider.generateDigest("admin:123")));
+		acls.add(acl);
+		connect.getZookeeper().setACL("/p1/p2/p3/p4", acls, -1);*/
+		//读
+		/*connect.getZookeeper().addAuthInfo("digest", "admin:123".getBytes());
+		String data = connect.data("/p1/p2/p3/p4", null);
+		System.out.println("----->" + data);*/
+		//connect.mkdir("/a1/a2","hello world!");
+		//connect.setAuthUserInfo("/a1", "admin", "admin");
+		
+		//connect.addAuthInfoByUserInfo("admin", "admin");
+		//connect.setAuthNull("/k1");
+	/*	try{
+			connect.children("/k22",null);
+		}catch(Exception e){
+			if(e.getCause() instanceof NoAuthException){
+				System.out.println("没有权限!!!!");
+			}else if(e.getCause() instanceof NoNodeException){
+				System.out.println("没有节点!!!");
+			}
+		}
+		connect.close();*/
+
 	}
 }

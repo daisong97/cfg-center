@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooDefs.Perms;
 import org.apache.zookeeper.data.Stat;
 
 import xyz.daisong.zookeeper.exceptions.ZkOperationException;
@@ -85,4 +86,42 @@ public interface ZkClient {
 	 * 迭代创建创建节点
 	 */
 	void mkdir(String path, String data) throws ZkOperationException ;
+	
+	//boolean addAuthInfo(String scheme, byte[] auth,String authPath);
+	/**
+	 * 设置权限为空 递归子目录<注意：首先应设置对应的权限凭证>
+	 * @param path
+	 * @return 是否成功
+	 */
+	void setAuthNull(String path) throws ZkOperationException ;
+	/**
+	 * 设置用户名，密码认证  递归子目录
+	 * @param path
+	 * @param username
+	 * @param password
+	 * @return 是否成功
+	 */
+	void setAuthUserInfo(String path,String username,String password, Perms perms) throws ZkOperationException ;
+	/**
+	 *设置ip认证  递归目录
+	 * @param path
+	 * @param ip
+	 * @return 是否成功
+	 */
+	void setAuthIp(String path,String ip,Perms perms) throws ZkOperationException ;
+	
+	/**
+	 * 添加用户认证凭证
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	void addAuthInfoByUserInfo(String username,String password);
+	
+	/**
+	 * 添加ip认证凭证
+	 * @param ip
+	 * @return
+	 */
+	void addAuthInfoByIp(String ip);
 }

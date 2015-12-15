@@ -11,4 +11,12 @@ public final class CCConstant {
 	public static String SYS_ROOT_PATH = "/zk_test";
 	/**引用地址,多个路径","分开*/
 	public static String QUOTE_PATH = "QUOTE_PATH";
+	
+	public static String ZOOKEEPER_SCHEME_WORLD = "world";
+	
+	public static String ZOOKEEPER_SCHEME_AUTH  = "auth";
+	
+	public static String ZOOKEEPER_SCHEME_DIGEST = "digest";
+	
+	public static String ZOOKEEPER_SCHEME_IP = "ip";
 }

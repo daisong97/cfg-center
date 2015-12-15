@@ -1,5 +1,7 @@
 package xyz.daisong.zookeeper;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +13,14 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooDefs.Perms;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +56,7 @@ public class ZkClientDefault implements ZkClient {
 						connectedLatch.countDown();
 						//停止延时线程
 						//thread.stop();
+						thread.interrupt();
 					}
 				}
 			});
@@ -136,8 +144,7 @@ public class ZkClientDefault implements ZkClient {
 	@Override
 	public void update(String path, String rData) throws ZkOperationException {
 		try{
-			Stat stat = zookeeper.exists(path, false);
-			zookeeper.setData(path, rData.getBytes(), stat.getVersion());
+			zookeeper.setData(path, rData.getBytes(), -1);
 		}catch(Exception e){
 			throw new ZkOperationException(e);
 		}
@@ -146,8 +153,7 @@ public class ZkClientDefault implements ZkClient {
 	@Override
 	public void delete(String path) throws ZkOperationException {
 		try {
-			Stat stat = zookeeper.exists(path, false);
-			zookeeper.delete(path,  stat.getVersion());
+			zookeeper.delete(path,  -1);
 		} catch (InterruptedException | KeeperException e) {
 			throw new ZkOperationException(e);
 		}
@@ -198,5 +204,72 @@ public class ZkClientDefault implements ZkClient {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void setAuthNull(String path) throws ZkOperationException {
+		try{
+			setAuth(path,Ids.OPEN_ACL_UNSAFE);
+		}catch(Exception e){
+			throw new ZkOperationException(e);
+		}
+	}
+
+	@Override
+	public void setAuthUserInfo(String path, String username, String password,Perms perms) throws ZkOperationException {
+		try{
+			List<ACL> acls = new ArrayList<ACL>();
+			ACL acl = new ACL(ZooDefs.Perms.ALL, new Id("digest", 
+					DigestAuthenticationProvider.generateDigest(username + ":"+ password)));
+			acls.add(acl);
+			setAuth(path,acls);
+		}catch(Exception e){
+			throw new ZkOperationException(e);
+		}
+	}
+
+	@Override
+	public void setAuthIp(String path, String ip,Perms perms) throws ZkOperationException{
+		try{
+			List<ACL> acls = new ArrayList<ACL>();
+			ACL acl = new ACL(ZooDefs.Perms.ALL, new Id("ip", ip));
+			acls.add(acl);
+			setAuth(path, acls);
+		}catch(Exception e){
+			throw new ZkOperationException(e);
+		}
+
+	}
+
+	@Override
+	public void addAuthInfoByUserInfo(String username, String password) {
+		zookeeper.addAuthInfo("digest", (username + ":" + password).getBytes());
+	}
+
+	@Override
+	public void addAuthInfoByIp(String ip) {
+		zookeeper.addAuthInfo("ip", ip.getBytes());
+	}
+	/**
+	 * 设置权限
+	 * @param path
+	 * @param username
+	 * @param password
+	 * @param acls
+	 * @throws NoSuchAlgorithmException
+	 * @throws KeeperException
+	 * @throws InterruptedException
+	 */
+	private void setAuth(String path,List<ACL> acls)
+			throws NoSuchAlgorithmException, KeeperException,
+			InterruptedException {
+		List<String> children =  zookeeper.getChildren(path, false);
+		zookeeper.setACL(path, acls, -1);
+		if(!CollectionUtils.isEmpty(children)){
+			for(String p : children){
+				setAuth(path + "/" + p, acls);
+			}
+		}
+		
 	}
 }
