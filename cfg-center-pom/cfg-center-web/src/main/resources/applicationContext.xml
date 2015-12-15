@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="xyz.daisong.service" />
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:cfg-center.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        
+        <!-- 数据库连接池保持的最小连接数 -->
+		<property name="minIdle" value="5" />
+		<!-- 数据库连接池保持的最大连接数 --> 
+		<property name="maxIdle" value="30" />
+		<!-- 取得连接时是否进行有效性验证 -->
+		<property name="testOnBorrow" value="true" />
+		<!-- 返回连接时是否进行有效性验证 -->
+		<property name="testOnReturn" value="true" />
+		<!-- 连接空闲时是否进行有效性验证 -->
+		<property name="testWhileIdle" value="true" />
+    </bean>
+    
+    
+</beans>
