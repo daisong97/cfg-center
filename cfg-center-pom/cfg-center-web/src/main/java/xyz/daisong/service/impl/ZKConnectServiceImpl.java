@@ -1,5 +1,11 @@
 package xyz.daisong.service.impl;
 
+import java.util.List;
+
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException.NoAuthException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.zookeeper.ZooDefs.Ids;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +21,6 @@ public class ZKConnectServiceImpl implements ZKConnectService {
 	@Value("${zk-address}")
 	private String zkAddress = "127.0.0.1:2181";
 	
-	@Value("${zk-scheme}")
-	private String scheme;
-	
-	@Value("${zk-auth}")
-	private String auth;
-	
-			
 	@Override
 	public ZkClient connect() throws ZkConnectException {
 		return getConnect();
@@ -53,16 +52,19 @@ public class ZKConnectServiceImpl implements ZKConnectService {
 		
 		//connect.addAuthInfoByUserInfo("admin", "admin");
 		//connect.setAuthNull("/k1");
-	/*	try{
-			connect.children("/k22",null);
+		try{
+			List<String> children = connect.children("/zookeeper/quota",null);
+			System.out.println(children);
+			
+			connect.getZookeeper().create("/t", "aa".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
 		}catch(Exception e){
 			if(e.getCause() instanceof NoAuthException){
 				System.out.println("没有权限!!!!");
 			}else if(e.getCause() instanceof NoNodeException){
 				System.out.println("没有节点!!!");
 			}
+			e.printStackTrace();
 		}
-		connect.close();*/
-
+		connect.close();
 	}
 }

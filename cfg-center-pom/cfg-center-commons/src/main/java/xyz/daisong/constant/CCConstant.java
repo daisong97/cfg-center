@@ -8,7 +8,7 @@ public final class CCConstant {
 	/**离线*/
 	public static String IS_ONLINE_FALSE = "offline";
 	/**系统基本路径*/
-	public static String SYS_ROOT_PATH = "/zk_test";
+	public static String SYS_ROOT_PATH = "/cgf_center";
 	/**引用地址,多个路径","分开*/
 	public static String QUOTE_PATH = "QUOTE_PATH";
 	
